@@ -9,5 +9,5 @@ file_put_contents(__DIR__ . '/../mime.types', $mimes);
 
 // Update cache
 @unlink(__DIR__ . '/../mime.types.db');
-$loader = (new \Mimey\MimeMappingLoader())
-    ->load(__DIR__ . '/../mime.types');
+$loader = new new \Mimey\MimeMappingLoader();
+$loader->load(__DIR__ . '/../mime.types');

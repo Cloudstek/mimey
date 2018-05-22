@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Mimey">
+    <config name="php_version" value="70100" />
+    <config name="installed_paths" value="vendor/slevomat/coding-standard,vendor/wimg/php-compatibility"/>
+
+    <!-- Files -->
+    <file>./src</file>
+
+    <!-- PSR-1 -->
+    <rule ref="PSR1" />
+
+    <!-- PSR-2 -->
+    <rule ref="PSR2">
+        <exclude name="Generic.Arrays.DisallowLongArraySyntax.Found" />
+    </rule>
+
+    <!-- Squizlabs coding standard -->
+    <rule ref="Squiz">
+        <!-- <exclude name="Squiz.Arrays" /> -->
+        <exclude name="Squiz.Commenting" />
+        <exclude name="Squiz.Files" />
+        <exclude name="Squiz.NamingConventions" />
+        <exclude name="Squiz.WhiteSpace" />
+        <exclude name="Squiz.PHP" />
+        <exclude name="Squiz.Operators.ComparisonOperatorUsage" />
+        <!-- <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned" /> -->
+        <!-- <exclude name="Squiz.ControlStructures.ElseIfDeclaration" /> -->
+        <!-- <exclude name="Squiz.ControlStructures.SwitchDeclaration" /> -->
+        <!-- <exclude name="Squiz.Formatting.OperatorBracket.MissingBrackets" /> -->
+        <exclude name="Generic.Formatting" />
+        <exclude name="Generic.Commenting.DocComment" />
+        <!-- <exclude name="PEAR.Functions" /> -->
+    </rule>
+
+    <!-- Check FQDN with file path -->
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array" value="src=>Mimey"/>
+        </properties>
+    </rule>
+
+    <!-- Check PHP syntax -->
+    <rule ref="Generic.PHP.Syntax" />
+
+    <!-- Check php version compatibility -->
+    <config name="testVersion" value="5.3-"/>
+    <rule ref="PHPCompatibility" />
+</ruleset>
