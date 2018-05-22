@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Download new mime.types file
+$mimes = file_get_contents('https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
+file_put_contents(__DIR__ . '/../mime.types', $mimes);
+
+// Update cache
+@unlink(__DIR__ . '/../mime.types.db');
+$loader = (new \Mimey\MimeMappingLoader())
+    ->load(__DIR__ . '/../mime.types');
