@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="Mimey">
     <config name="php_version" value="70100" />
-    <config name="installed_paths" value="vendor/slevomat/coding-standard,vendor/wimg/php-compatibility"/>
+    <config name="installed_paths" value="vendor/wimg/php-compatibility"/>
 
     <!-- Files -->
     <file>./src</file>
@@ -30,13 +30,6 @@
         <exclude name="Generic.Formatting" />
         <exclude name="Generic.Commenting.DocComment" />
         <!-- <exclude name="PEAR.Functions" /> -->
-    </rule>
-
-    <!-- Check FQDN with file path -->
-    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
-        <properties>
-            <property name="rootNamespaces" type="array" value="src=>Mimey"/>
-        </properties>
     </rule>
 
     <!-- Check PHP syntax -->
