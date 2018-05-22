@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+@unlink(__DIR__ . '/../mime.types.db');
+
+$loader = (new \Mimey\MimeMappingLoader())
+    ->load(__DIR__ . '/../mime.types');

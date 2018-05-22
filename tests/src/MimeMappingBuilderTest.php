@@ -1,12 +1,9 @@
 <?php
 
-class MimeMappingBuilderTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class MimeMappingBuilderTest extends TestCase
 {
-	protected function setUp()
-	{
-
-	}
-
 	public function testFromEmpty()
 	{
 		$builder = \Mimey\MimeMappingBuilder::blank();
@@ -71,9 +68,10 @@ class MimeMappingBuilderTest extends \PHPUnit_Framework_TestCase
 		$builder->add('foo/two2', 'two');
 		$file = tempnam(sys_get_temp_dir(), 'mapping_test');
 		$builder->save($file);
-		$mapping_included = require $file;
+		$loader = new \Mimey\MimeMappingLoader();
+		$mapping_included = $loader->load(null, $file);
 		$this->assertEquals($builder->getMapping(), $mapping_included);
-		$builder2 = \Mimey\MimeMappingBuilder::load($file);
+		$builder2 = \Mimey\MimeMappingBuilder::loadCache($file);
 		unlink($file);
 		$this->assertEquals($builder->getMapping(), $builder2->getMapping());
 	}

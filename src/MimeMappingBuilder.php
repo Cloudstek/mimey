@@ -7,17 +7,53 @@ namespace Mimey;
  */
 class MimeMappingBuilder
 {
-	/** @var array The mapping array. */
+	/**
+	 * Mapping
+	 * @var array
+	 */
 	protected $mapping;
+
+	/**
+	 * MIME mapping loader
+	 * @var MimeMappingLoaderInterface
+	 */
+	protected $loader;
 
 	/**
 	 * Create a new mapping builder.
 	 *
-	 * @param array $mapping An associative array containing two entries. See `MimeTypes` constructor for details.
+	 * @param array $mapping An associative array containing two entries.
+	 * Entry "mimes" being an associative array of extension to array of MIME types.
+	 * Entry "extensions" being an associative array of MIME type to array of extensions.
+	 * Example:
+	 * <code>
+	 * array(
+	 *   'extensions' => array(
+	 *     'application/json' => array('json'),
+	 *     'image/jpeg'       => array('jpg', 'jpeg'),
+	 *     ...
+	 *   ),
+	 *   'mimes' => array(
+	 *     'json' => array('application/json'),
+	 *     'jpeg' => array('image/jpeg'),
+	 *     ...
+	 *   )
+	 * )
+	 * </code>
+	 * @param MimeMappingLoaderInterface $loader MIME mapping loader
 	 */
-	private function __construct($mapping)
+	private function __construct($mapping = null, $loader = null)
 	{
 		$this->mapping = $mapping;
+		$this->loader = $loader;
+
+		if ($mapping === null) {
+			$mapping = array('mimes' => array(), 'extensions' => array());
+		}
+
+		if ($loader === null) {
+			$this->loader = new MimeMappingLoader();
+		}
 	}
 
 	/**
@@ -32,22 +68,27 @@ class MimeMappingBuilder
 	{
 		$existing_extensions = empty($this->mapping['extensions'][$mime]) ? array() : $this->mapping['extensions'][$mime];
 		$existing_mimes = empty($this->mapping['mimes'][$extension]) ? array() : $this->mapping['mimes'][$extension];
+
 		if ($prepend_extension) {
 			array_unshift($existing_extensions, $extension);
 		} else {
 			$existing_extensions[] = $extension;
 		}
+
 		if ($prepend_mime) {
 			array_unshift($existing_mimes, $mime);
 		} else {
 			$existing_mimes[] = $mime;
 		}
+
 		$this->mapping['extensions'][$mime] = array_unique($existing_extensions);
 		$this->mapping['mimes'][$extension] = array_unique($existing_mimes);
 	}
 
 	/**
-	 * @return array The mapping.
+	 * Get current mapping
+	 *
+	 * @return array
 	 */
 	public function getMapping()
 	{
@@ -55,29 +96,13 @@ class MimeMappingBuilder
 	}
 
 	/**
-	 * Compile the current mapping to PHP.
-	 *
-	 * @return string The compiled PHP code to save to a file.
-	 */
-	public function compile()
-	{
-		$mapping = $this->getMapping();
-		$mapping_export = var_export($mapping, true);
-		return "<?php return $mapping_export;";
-	}
-
-	/**
 	 * Save the current mapping to a file.
 	 *
-	 * @param string   $file    The file to save to.
-	 * @param int      $flags   Flags for `file_put_contents`.
-	 * @param resource $context Context for `file_put_contents`.
-	 *
-	 * @return int|bool The number of bytes that were written to the file, or false on failure.
+	 * @param string $file The file to save to.
 	 */
-	public function save($file, $flags = null, $context = null)
+	public function save($file)
 	{
-		return file_put_contents($file, $this->compile(), $flags, $context);
+		$this->loader->save($this->getMapping(), $file);
 	}
 
 	/**
@@ -87,19 +112,41 @@ class MimeMappingBuilder
 	 */
 	public static function create()
 	{
-		return self::load(dirname(__DIR__) . '/mime.types.php');
+		return self::load(__DIR__ . '/../mime.types');
 	}
 
 	/**
 	 * Create a new mapping builder based on types from a file.
 	 *
-	 * @param string $file The compiled PHP file to load.
+	 * @param string $file The magic mime.types file to load
+	 * @param MimeMappingLoaderInterface $loader MIME mapping loader
 	 *
 	 * @return MimeMappingBuilder A mapping builder with types loaded from a file.
 	 */
-	public static function load($file)
+	public static function load($file, $loader = null)
 	{
-		return new self(require($file));
+		if ($loader === null) {
+			$loader = new MimeMappingLoader();
+		}
+
+		return new self($loader->load($file));
+	}
+
+	/**
+	 * Create a new mapping builder based on types from a cached mapping file.
+	 *
+	 * @param string $file The cached MIME mapping file to load
+	 * @param MimeMappingLoaderInterface $loader MIME mapping loader
+	 *
+	 * @return MimeMappingBuilder A mapping builder with types loaded from a file.
+	 */
+	public static function loadCache($file, $loader = null)
+	{
+		if ($loader === null) {
+			$loader = new MimeMappingLoader();
+		}
+
+		return new self($loader->load(null, $file));
 	}
 
 	/**

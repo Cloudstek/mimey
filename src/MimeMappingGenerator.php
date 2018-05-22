@@ -9,54 +9,56 @@ namespace Mimey;
  */
 class MimeMappingGenerator
 {
-	protected $mime_types_text;
-
 	/**
-	 * Create a new generator instance with the given mime.types text.
+	 * Read the given mime.types file and return a mapping compatible with the MimeTypes class.
 	 *
-	 * @param string $mime_types_text The text from the mime.types file.
-	 */
-	public function __construct($mime_types_text)
-	{
-		$this->mime_types_text = $mime_types_text;
-	}
-
-	/**
-	 * Read the given mime.types text and return a mapping compatible with the MimeTypes class.
+	 * @param string $magicFile Path to the mime.types magic file
 	 *
 	 * @return array The mapping.
 	 */
-	public function generateMapping()
+	public function generateMapping($magicFile)
 	{
+		if (empty($magicFile)) {
+			return MimeMappingBuilder::blank()->getMapping();
+		}
+
+		// Current mapping
 		$mapping = array();
-		$lines = explode("\n", $this->mime_types_text);
-		foreach ($lines as $line) {
-			$line = trim(preg_replace('~\\#.*~', '', $line));
-			$parts = $line ? array_values(array_filter(explode("\t", $line))) : array();
-			if (count($parts) === 2) {
-				$mime = trim($parts[0]);
-				$extensions = explode(' ', $parts[1]);
-				foreach ($extensions as $extension) {
-					$extension = trim($extension);
-					if ($mime && $extension) {
-						$mapping['mimes'][$extension][] = $mime;
-						$mapping['extensions'][$mime][] = $extension;
-					}
+
+		// Magic MIME file
+		$magicFile = fopen($magicFile, 'r');
+
+		while (($line = fgets($magicFile)) !== false) {
+			// Parse line
+			$matchFound = preg_match('/^([^\s\#\/]+(?:\/[^\s]+)?)\s+([^\#]+)/', trim($line), $matches);
+
+			// Skip if we don't have a match
+			if ($matchFound === false || count($matches) !== 3) {
+				continue;
+			}
+
+			// Get matches
+			list($line, $mime, $extensions) = $matches;
+
+			// Split extensions by space
+			$extensions = explode(' ', $extensions);
+
+			foreach ($extensions as $extension) {
+				$extension = trim($extension);
+
+				if (!empty($mime) && !empty($extension)) {
+					$mapping['mimes'][$extension][] = $mime;
+					$mapping['extensions'][$mime][] = $extension;
 				}
 			}
 		}
-		return $mapping;
-	}
 
-	/**
-	 * Read the given mime.types text and generate mapping code.
-	 *
-	 * @return string The mapping PHP code for inclusion.
-	 */
-	public function generateMappingCode()
-	{
-		$mapping = $this->generateMapping();
-		$mapping_export = var_export($mapping, true);
-		return "<?php return $mapping_export;";
+		if (!feof($magicFile)) {
+			fclose($magicfile);
+			throw new \Exception('Unexpected EOF.');
+		}
+
+		fclose($magicFile);
+		return $mapping;
 	}
 }

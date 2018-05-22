@@ -1,0 +1,8 @@
+#ignore	me
+# also ignore me
+  # and me too
+application/json			json
+image/jpeg			jpeg jpg #ignore this too
+image/vnd.dece.graphic    uvi uvvi uvg uvvg
+foo	bar baz
+qux	bar

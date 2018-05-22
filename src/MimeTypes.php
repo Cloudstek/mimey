@@ -7,10 +7,16 @@ namespace Mimey;
  */
 class MimeTypes implements MimeTypesInterface
 {
-	/** @var array The cached built-in mapping array. */
+	/**
+	 * The cached built-in mapping
+	 * @var array
+	 */
 	private static $built_in;
 
-	/** @var array The mapping array. */
+	/**
+	 * Mapping
+	 * @var array
+	 */
 	protected $mapping;
 
 	/**
@@ -39,10 +45,10 @@ class MimeTypes implements MimeTypesInterface
 	 */
 	public function __construct($mapping = null)
 	{
+		$this->mapping = $mapping;
+
 		if ($mapping === null) {
 			$this->mapping = self::getBuiltIn();
-		} else {
-			$this->mapping = $mapping;
 		}
 	}
 
@@ -102,8 +108,10 @@ class MimeTypes implements MimeTypesInterface
 	protected static function getBuiltIn()
 	{
 		if (self::$built_in === null) {
-			self::$built_in = require(dirname(__DIR__) . '/mime.types.php');
+			$loader = new MimeMappingLoader();
+			self::$built_in = $loader->load(__DIR__ . '/../mime.types');
 		}
+
 		return self::$built_in;
 	}
 

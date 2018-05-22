@@ -1,6 +1,8 @@
 <?php
 
-class MimeTypesTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class MimeTypesTest extends TestCase
 {
 	/** @var \Mimey\MimeTypes */
 	protected $mime;

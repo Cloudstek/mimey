@@ -1,5 +1,5 @@
 <phpunit
-	bootstrap="tests/bootstrap.php"
+	bootstrap="vendor/autoload.php"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
@@ -18,5 +18,4 @@
 	<logging>
 		<log type="coverage-clover" target="build/logs/clover.xml"/>
 	</logging>
-
 </phpunit>

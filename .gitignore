@@ -4,3 +4,5 @@
 /build/
 composer.phar
 composer.lock
+
+/mime.types.*
